@@ -54,7 +54,7 @@ for filters in [200, 400]:
                               output_dim=200,
                               input_length=150,
                               weights=[vector]))
-            seq.add(Reshape(dims=(1, 150, vector.shape[1])))
+            seq.add(Reshape(((1, 150, vector.shape[1]))))
             seq.add(GaussianNoise(0.001))
             # print seq.get_config()
             seqList.append(seq)
@@ -63,9 +63,9 @@ for filters in [200, 400]:
         windows = [6, 7, 8, 9]
         for window in windows:
             winSeq = Sequential()
-            winSeq.add(Merge(layers=seqList, mode='concat', concat_axis=-3))
-            winSeq.add(Reshape(dims=(len(word_dict), 150, 200)))
-            winSeq.add(Convolution2D(filters, window, 200, activation='relu'))
+            winSeq.add(Merge(layers=seqList, mode='concat', concat_axis=-3))            
+            winSeq.add(Reshape(((len(word_dict), 150, 200))))            
+            winSeq.add(Convolution2D(filters, window, 200, activation='relu', dim_ordering="th"))
             winSeq.add(MaxPooling2D(pool_size=(150 - window + 1, 1)))
             winSeq.add(Flatten())
             windowsSeqList.append(winSeq)
@@ -95,8 +95,6 @@ for filters in [200, 400]:
             [train_array] * len(seqList),
             train_label_cat,
             validation_data=([test_array] * len(seqList), test_label_cat),
-            show_accuracy=True,
             batch_size=batchsize,
             nb_epoch=30,
             callbacks=[callbackmy])
-
